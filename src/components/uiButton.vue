@@ -63,7 +63,7 @@ export default {
     height 100%  
     color #fff
     background: #38A96D
-  &::disabled
+  &:disabled
     width 100%
     height 100%
     color: #9D9DA3

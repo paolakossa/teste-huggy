@@ -6,13 +6,13 @@
         </div>
         <div class="container-image">
             <div class="container-image-header">
-                <img class="container-image-property" :src="imagePath"/>
+                <img class="container-image-property" :src="imageAvatar"/>
                 <div class="container-text">
                     <div class="container-text-header">
                         <div class="conatiner-text-property">Agostinho Carrara</div>
                     </div>
                     <div class="container-message">
-                        <div v-if="chatMessages.length > 0" class="container-message-property"> {{ chatMessages[0].text }}</div>
+                        <div v-if="chatMessages.length > 0" class="container-message-property"> {{  getFirstAgentMessageText }}</div>
                     </div>
                 </div>
             </div>
@@ -21,7 +21,7 @@
     <div class="body-container-context" >
         <div class="container-name">
             <div class="container-name-image">
-                <img class="container-name-image-property" :src="imagePathSmall" />
+                <img class="container-name-image-property" :src="imageAvatarSmall" />
                 <div class="container-name-property">Agostinho Carrara</div>
             </div>
         </div>
@@ -44,9 +44,9 @@
             </div>
         </div>
         <div class="body-container-components">
-            <ui-text-area v-model="newMessageText" placeholder="Escreva sua mensagem..."/>
+            <ui-text-area v-model="newMessageText" placeholder="Escreva sua mensagem..." @input="storeImage"/>
             <div class="container-button">
-                <ui-button class="sucess" label="Enviar" @click="reabrirChat"/>
+                <ui-button :disabled="newMessageText === ''" class="sucess" label="Enviar" @click="reabrirChat"/>
             </div>
         </div>
     </div>
@@ -57,6 +57,7 @@
 import uiButton from "@/components/uiButton.vue"
 import uiTextArea from "@/components/uiTextArea.vue"
 import axios from "axios"
+
 export default {
     name: 'atendimento-view',
 
@@ -64,11 +65,21 @@ export default {
 
     data() {
       return {
-        imagePath: require('@/assets/size=bigagostinho.svg'),
-        imagePathSmall: require('@/assets/size=small.svg'),
+        imageAvatar: require('@/assets/size=bigagostinho.svg'),
+        imageAvatarSmall: require('@/assets/size=small.svg'),
         chatMessages: [],
         newMessageText: "",
+        imageFile:''
       }
+    },
+
+    computed: {
+        getFirstAgentMessageText() {
+            const firstAgentMessage = this.chatMessages.find(message => message.senderType ==='agent')
+            if (firstAgentMessage) {
+            return firstAgentMessage.text
+            }
+        }
     },
 
     mounted() {
@@ -89,7 +100,7 @@ export default {
             }
         }
         await axios
-            .get("https://api.huggy.app/v3/chats/191724354/messages", config)
+            .get("https://api.huggy.app/v3/chats/191775429/messages", config)
             .then(response => {
                 this.chatMessages = response.data
             })
@@ -98,15 +109,13 @@ export default {
             });
         },
         async enviarMensagem() {
-            const chatId = 191724354
+            const chatId = 191775429
             const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE"
-            
 
-            const mensagem = {
-            text:  this.newMessageText,
-            file: "https://c.pzw.io/img/avatar-user-boy.jpg",
-            isInternal: false,
-            };
+            const mensagem = new FormData()
+            mensagem.append('text', this.newMessageText)
+            mensagem.append('file', this.imageFile )
+            mensagem.append('isInternal', false)
 
             try {
              
@@ -115,6 +124,7 @@ export default {
                 mensagem,
                 {
                 headers: {
+                    'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,
                 },
                 }
@@ -126,7 +136,7 @@ export default {
             }
         },
         async reabrirChat() {
-            const chatId = 191724354
+            const chatId = 191775429
             const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE"
 
 
@@ -145,6 +155,10 @@ export default {
                 console.error("Erro ao reabrir o chat:", error)
             }
         },
+        storeImage(imageURL) {
+            console.log(imageURL)
+            this.imageFile = imageURL
+        }
     }
     
 }
@@ -318,7 +332,7 @@ export default {
         align-items: flex-end 
         display: flex
         &-color
-            align-self: stretch 
+            align-self: flex-end 
             padding-left: 20px 
             padding-right: 20px 
             padding-top: 14px
@@ -335,10 +349,23 @@ export default {
             display: inline-flex
             &-agent
                 background: #fff
+                align-self: flex-end 
+                padding-left: 20px 
+                padding-right: 20px 
+                padding-top: 14px
+                padding-bottom: 14px
+                border-top-left-radius: 6px
+                border-top-right-radius: 6px 
+                border-bottom-right-radius: 2px 
+                border-bottom-left-radius: 6px 
+                justify-content: flex-start 
+                align-items: flex-start 
+                gap: 10px 
+                display: inline-flex
 
     .container-card-message
         flex: 1 1 0 
-        height: 58px 
+        height: 30px 
         justify-content: flex-start 
         align-items: flex-start 
         display: flex
