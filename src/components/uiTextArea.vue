@@ -27,10 +27,10 @@ props: {
 
 methods: {
     updateValue(event) {
-      this.$emit('input', event.target.value);
+      this.$emit('input', event.target.value)
     },
     openImageInput() {
-        this.$refs.imageInput.click();
+        this.$refs.imageInput.click()
     },
   
     uploadImage(event) {

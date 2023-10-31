@@ -34,7 +34,7 @@ export default {
       this.$emit('click')
     }
   },
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

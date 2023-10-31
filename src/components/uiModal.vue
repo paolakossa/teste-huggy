@@ -12,17 +12,17 @@
     data() {
       return {
         isOpen: false,
-      };
+      }
     },
     methods: {
       openModal() {
-        this.isOpen = true;
+        this.isOpen = true
       },
       closeModal() {
-        this.isOpen = false;
+        this.isOpen = false
       },
     },
-  };
+  }
   </script>
 <style scoped lang="stylus">
 .modal

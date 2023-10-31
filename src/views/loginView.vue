@@ -22,14 +22,12 @@ export default {
   
     methods: {
     redirectToExternalLogin() {
-      // Token de acesso que você deseja passar para a página de login externa
-        const tokenDeAcesso = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE";
+      const tokenDeAcesso = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE"
 
-      // URL da página de login externa com o token de acesso como parâmetro
-      const urlDaPaginaDeLoginExterna = `https://www.huggy.app/?access_token=${tokenDeAcesso}&return=http://localhost:8080/atendimento`;
+      const urlDaPaginaDeLoginExterna = `https://www.huggy.app/?access_token=${tokenDeAcesso}&return=http://localhost:8080/atendimento`
 
-      // Redireciona o usuário para a página de login externa
-      window.location.href = urlDaPaginaDeLoginExterna;
+      
+      window.location.href = urlDaPaginaDeLoginExterna
     }
   },
 }

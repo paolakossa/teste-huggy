@@ -111,7 +111,7 @@ export default {
 
     methods: {
         formatDateTime(dateTime) {
-            const date = new Date(dateTime);
+            const date = new Date(dateTime)
             return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
         },
         async getMessages() {
@@ -129,7 +129,7 @@ export default {
             })
             .catch(error => {
                 console.error("Erro na requisição GET:", error)
-            });
+            })
         },
         async enviarMensagem() {
             const chatId = 192059548
@@ -139,7 +139,7 @@ export default {
             text:  this.newMessageText,
             file: this.imgURL,
             isInternal: false,
-            };
+            }
 
             try {
              
@@ -153,9 +153,9 @@ export default {
                 },
                 
                 }
-            );
+            )
             this.chatMessages.unshift(response.data)
-            this.newMessageText = "";
+            this.newMessageText = ""
             this.imgURL = ''
             } catch (error) {
             console.error("Erro ao enviar a mensagem:", error)
@@ -176,7 +176,7 @@ export default {
                         },
                     }
                 )
-                this.enviarMensagem();
+                this.enviarMensagem()
             } catch (error) {
                 console.error("Erro ao reabrir o chat:", error)
             }
@@ -185,8 +185,8 @@ export default {
             this.$refs.modal.openModal()
         },
         saveImageURL() {
-        this.imgURL = this.imgURLInput;
-        this.showModal = false; 
+        this.imgURL = this.imgURLInput
+        this.showModal = false 
         this.enviarMensagem()
         this.imgURL= ''
         this.$refs.modal.closeModal()
@@ -468,10 +468,10 @@ export default {
     width: 30px
     background: #fff
     border:none
-    position: absolute;
-    left: 94%;
-    margin-top: 74px;
-    margin-left: 10px;
+    position: absolute
+    left: 94%
+    margin-top: 74px
+    margin-left: 10px
     cursor pointer
 .modal-contet-title
     font-size: 20px 
