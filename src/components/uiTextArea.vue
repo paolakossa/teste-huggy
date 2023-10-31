@@ -5,12 +5,6 @@
     :value="value"
     class="text-area-container-property"
     @input="updateValue" />
-    <input type="file" @change="uploadImage" accept="image/*" style="display: none" ref="imageInput" />
-    <img ref="imgUpload" id="uploadedimage"  alt="imagem de arquivo pnj/jpeg/jpg" width="200px"/>
-    <button class="text-area-container-property-button" @click="openImageInput()">
-        <img :src="buttonState === 'notSent' ? imageFile : sentImageFile"/>
-    </button>
-
 </div>
 </template>
 
@@ -31,14 +25,6 @@ props: {
     }
 },
 
-data() {
-    return {
-        imageFile: require('@/assets/Vector.svg'),
-        sentImageFile: require('@/assets/Type=cancel.svg'),
-        buttonState: 'notSent',
-    }
-},
-
 methods: {
     updateValue(event) {
       this.$emit('input', event.target.value);
@@ -49,7 +35,7 @@ methods: {
   
     uploadImage(event) {
         this.addImg(event)
-		this.$emit("input",  event.target.value)
+		this.$emit("input",  event)
     },
     addImg(event, base64) {
         let preview = this.$refs.imgUpload
@@ -96,15 +82,7 @@ methods: {
             font-weight: 400
             line-height: 28.80px
             word-wrap: break-word
-        &-button
-            width: 30px
-            background: #fff
-            border:none
-            position: absolute;
-            left: 94%;
-            margin-top: 64px;
-            margin-left: 6px;
-            cursor pointer
+            
 
 </style>
 

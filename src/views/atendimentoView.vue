@@ -12,7 +12,10 @@
                         <div class="conatiner-text-property">Agostinho Carrara</div>
                     </div>
                     <div class="container-message">
-                        <div v-if="chatMessages.length > 0" class="container-message-property"> {{  getFirstAgentMessageText }}</div>
+                        <template v-if="firstAgentMessage">
+                            <img v-if="firstAgentMessage.type === 'image'" :src="firstAgentMessage.file" class="img" alt="Imagem">
+                            <span v-else>{{ firstAgentMessage.text }}</span>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -32,7 +35,15 @@
                         <div class="container-card-text-background">
                             <div :class="message.senderType === 'agent' ? 'container-card-text-background-color-agent' : 'container-card-text-background-color'">
                                 <div class="container-card-message">
-                                    <div :class="message.senderType === 'agent' ? 'container-card-message-property-agent' : 'container-card-message-property'">{{ message.text }}</div>
+                                    <div :class="message.senderType === 'agent' ? 'container-card-message-property-agent' : 'container-card-message-property'">
+                                        <template v-if="message.type === 'image'">
+                                        <img :src="message.file" alt="Imagem">
+                                        </template>
+                                        <!-- Se não for uma imagem, exiba o texto normalmente -->
+                                        <template v-else>
+                                        {{ message.text }}
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                             <div class="container-card-time">
@@ -44,7 +55,19 @@
             </div>
         </div>
         <div class="body-container-components">
-            <ui-text-area v-model="newMessageText" placeholder="Escreva sua mensagem..." @input="storeImage"/>
+            <ui-modal ref="modal">
+                <div>
+                    <div class="modal-content">
+                        <h2 class="modal-contet-title">Insira a URL da imagem</h2>
+                        <input v-model="imgURLInput" type="text" placeholder="URL da imagem" class="modal-content-input">
+                        <button class="modal-content-button" @click="saveImageURL">Salvar</button>
+                    </div>
+                </div>
+            </ui-modal>
+            <ui-text-area v-model="newMessageText" placeholder="Escreva sua mensagem..."/>
+            <button class="text-area-container-property-button" @click="openModal()">
+             <img :src="imageVector"/>
+            </button>
             <div class="container-button">
                 <ui-button :disabled="newMessageText === ''" class="sucess" label="Enviar" @click="reabrirChat"/>
             </div>
@@ -56,12 +79,12 @@
 <script>
 import uiButton from "@/components/uiButton.vue"
 import uiTextArea from "@/components/uiTextArea.vue"
+import uiModal from "@/components/uiModal.vue"
 import axios from "axios"
-
 export default {
     name: 'atendimento-view',
 
-    components: { uiButton, uiTextArea },
+    components: { uiButton, uiTextArea, uiModal },
 
     data() {
       return {
@@ -69,16 +92,16 @@ export default {
         imageAvatarSmall: require('@/assets/size=small.svg'),
         chatMessages: [],
         newMessageText: "",
-        imageFile:''
+        imageFile:'',
+        imageVector: require('@/assets/Vector.svg'),
+        imgURLInput: "",
+        imgURL: "", 
       }
     },
 
     computed: {
-        getFirstAgentMessageText() {
-            const firstAgentMessage = this.chatMessages.find(message => message.senderType ==='agent')
-            if (firstAgentMessage) {
-            return firstAgentMessage.text
-            }
+       firstAgentMessage() {
+            return this.chatMessages.find(message => message.senderType ==='agent')
         }
     },
 
@@ -100,7 +123,7 @@ export default {
             }
         }
         await axios
-            .get("https://api.huggy.app/v3/chats/191775429/messages", config)
+            .get("https://api.huggy.app/v3/chats/192059548/messages", config)
             .then(response => {
                 this.chatMessages = response.data
             })
@@ -109,34 +132,37 @@ export default {
             });
         },
         async enviarMensagem() {
-            const chatId = 191775429
+            const chatId = 192059548
             const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE"
 
-            const mensagem = new FormData()
-            mensagem.append('text', this.newMessageText)
-            mensagem.append('file', this.imageFile )
-            mensagem.append('isInternal', false)
+            const mensagem = {
+            text:  this.newMessageText,
+            file: this.imgURL,
+            isInternal: false,
+            };
 
             try {
              
             const response = await axios.post(
                 `https://api.huggy.app/v3/chats/${chatId}/messages`,
                 mensagem,
+                
                 {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`,
                 },
+                
                 }
             );
             this.chatMessages.unshift(response.data)
             this.newMessageText = "";
+            this.imgURL = ''
             } catch (error) {
             console.error("Erro ao enviar a mensagem:", error)
             }
         },
         async reabrirChat() {
-            const chatId = 191775429
+            const chatId = 192059548
             const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImUyMjA4ZGZhNjg5NTliODdmYmYzYTE1YTU2NzVjNzQ1ZDkzNzdhNjY2MTZhNTE3MWU3MGFmNzBiMGEzZGQxODc1MzUzZmVhMzNjOGNjODBjIn0.eyJhdWQiOiJBUFAtOWM5ZjgzYmMtNWY3My00OThmLTk3YzMtMzZkMTQ5MmQ4NGVmIiwianRpIjoiZTIyMDhkZmE2ODk1OWI4N2ZiZjNhMTVhNTY3NWM3NDVkOTM3N2E2NjYxNmE1MTcxZTcwYWY3MGIwYTNkZDE4NzUzNTNmZWEzM2M4Y2M4MGMiLCJpYXQiOjE2OTg1MDQwMDcsIm5iZiI6MTY5ODUwNDAwNywiZXhwIjoxNzE0MzE1MjA3LCJzdWIiOiIxMzQ0ODkiLCJzY29wZXMiOlsiaW5zdGFsbF9hcHAiLCJyZWFkX2FnZW50X3Byb2ZpbGUiXX0.USCxOcyd2x1mPLNXBLqKqzMKjX-kLTXFImQDrjhGume1grIKqDqtWLO8uFdUToGDx2FMdU3mGweIIcz_8WBwOgH9cB8jO1twxlINp9s5Ak_6sIiG10cA1pohxlIUf9X5CR1uI5CCh2R9oy1m2yU_VkVwFkxBM1e6XO-Xf1t_3mE"
 
 
@@ -155,10 +181,17 @@ export default {
                 console.error("Erro ao reabrir o chat:", error)
             }
         },
-        storeImage(imageURL) {
-            console.log(imageURL)
-            this.imageFile = imageURL
-        }
+        openModal() {
+            this.$refs.modal.openModal()
+        },
+        saveImageURL() {
+        this.imgURL = this.imgURLInput;
+        this.showModal = false; 
+        this.enviarMensagem()
+        this.imgURL= ''
+        this.$refs.modal.closeModal()
+        },
+        
     }
     
 }
@@ -254,6 +287,11 @@ export default {
     justify-content: flex-start 
     align-items: center 
     display: inline-flex
+    .img
+        object-fit: cover
+        width: 20%
+        margin-top: 18px
+           
     &-property
       flex: 1 1 0
       align-self: stretch
@@ -369,6 +407,10 @@ export default {
         justify-content: flex-start 
         align-items: flex-start 
         display: flex
+        img
+            object-fit: cover
+            width: 20%
+            margin-top: -10px
         &-property
             flex: 1 1 0
             color: white 
@@ -377,6 +419,7 @@ export default {
             font-weight: 400 
             line-height: 28.80px 
             word-wrap: break-word
+            
             &-agent
                 flex: 1 1 0
                 font-size: 16px 
@@ -421,5 +464,31 @@ export default {
     align-items: center 
     gap: 8px 
     display: flex
+.text-area-container-property-button
+    width: 30px
+    background: #fff
+    border:none
+    position: absolute;
+    left: 94%;
+    margin-top: 74px;
+    margin-left: 10px;
+    cursor pointer
+.modal-contet-title
+    font-size: 20px 
+    font-family: IBM Plex Sans 
+    font-weight: 400 
+    line-height: 28.80px 
+    word-wrap: break-word
+.modal-content-button
+    margin: 12px
+    boder-radius: 20px
+    background: #38A96D
+    color: white
+    border-radius: 8px
+    border: none
+    padding: 7px
+.modal-content-input
+    border-radius: 7px
+    width: 200px
 
 </style>
